@@ -12,9 +12,10 @@ body{
 header{
     display: flex;
     justify-content: center;
-    align-items: start;
+    align-items: center;
     width: 100%;
     height: 10%;
+    background-color:slateblue;
     
 }
 #searchBox{
@@ -35,18 +36,33 @@ header{
     flex-direction: column;
     justify-content:flex-start;
     width: 20%;
-    height: 100vh;
+    height: 80vh;
     margin: 10px;
 }
 
 #container{
-    height: 100vh;
-   width: 100%;
-   padding: 10px;
+    display: flex;
+    flex-direction: column;
+    height: 80vh;
+    width: 100%;
+    padding: 15px;
 
 }
 
 .mainContent{
     display: flex;
     flex-direction: row;
+}
+
+#today{
+height: 30%;
+width: 100%;
+border: 1px solid black;
+margin-bottom: 3em;
+}
+
+#fiveDay{
+height: 30%;
+width: 100%;
+font-size: 1.5em;
 }
