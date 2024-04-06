@@ -42,6 +42,7 @@ let url =`https://api.openweathermap.org/geo/1.0/direct?q=${city}&appid=${weathe
 fetch(url).then(function(response){
     return response.json();
 }).then(function(data){
+    fiveDayRender(data);
     console.log("--------- First request with geolocation --------")
     console.log(data);
 
@@ -73,7 +74,7 @@ fetch(url).then(function(response){
    let tempF=data2.main.temp
    let humidPer=data2.main.humidity
     cityName.innerHTML=city
-    cardDate.innerHTML=dayjs.unix(data2.dt).format('MM-DD-YY') //need to connect dayjs
+    cardDate.innerHTML=dayjs.unix(data2.dt).format('MM-DD-YY') 
     temperature.innerHTML= `Temperature: ${tempF} F`
     wind.innerHTML=`Wind Speed: ${windMPH} MPH`
     humidity.innerHTML= `Humidity: ${humidPer} %`
@@ -89,7 +90,20 @@ container.appendChild(wind)
 container.appendChild(humidity)
 container.className='newDiv'
 cityName.className='city'
+
 })
 })
 })
 
+function fiveDayRender(firstFetch){
+let latitude=firstFetch[0].lat
+let longitude=firstFetch[0].lon
+
+let fiveDayUrl=`api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&appid=${weatherAppAPIKey}`
+fetch(fiveDayUrl).then(function(response){
+    console.log(firstFetch)
+    return response.json();
+}).then(function(data){
+    console.log("5day fetch")
+    console.log(data);
+})}
