@@ -35,7 +35,9 @@ searchBox.value=''
 }
 
 
-const url =`https://api.openweathermap.org/geo/1.0/direct?q=${city}&appid=${weatherAppAPIKey}`
+
+
+let url =`https://api.openweathermap.org/geo/1.0/direct?q=${city}&appid=${weatherAppAPIKey}`
 
 fetch(url).then(function(response){
     return response.json();
@@ -53,35 +55,30 @@ fetch(url).then(function(response){
     }).then(function(data2){
         console.log("--------- Second request with forecase --------")
         console.log(data2);
-
-       
-    })
-
-})
-//insert f2
-})
-
-function mainDisplay(){
-
-
-}
+        console.log(data2.weather[0].icon)
+    
 
 //create task card
-function displays(){
+
     let container=document.createElement('div');
     let cityName=document.createElement('h2')
-    let cardDate=document.createElement('p');
+    let cardDate=document.createElement('h3');
     let temperature=document.createElement('p');
     let wind=document.createElement('p');
     let humidity=document.createElement('p');
-    let icon=document.createElement('p');
-cityName.innerHTML=
-cardDate.innerHTML=
-temperature.innerHTML=
-wind.innerHTML=
-humidity.innerHTML=
-icon.innerHTML=
+    let icon=document.createElement('h2');
+    let iconPic=data2.weather[0].icon
+   
+   let windMPH=Math.floor(data2.wind.speed/1.467)
+   let tempF=data2.main.temp
+   let humidPer=data2.main.humidity
+    cityName.innerHTML=city
+    cardDate.innerHTML=dayjs.unix(data2.dt).format('MM-DD-YY') //need to connect dayjs
+    temperature.innerHTML= `Temperature: ${tempF} F`
+    wind.innerHTML=`Wind Speed: ${windMPH} MPH`
+    humidity.innerHTML= `Humidity: ${humidPer} %`
 
+    icon.innerHTML=`<img src= https://openweathermap.org/img/wn/${iconPic}@2x.png>`
 
 today.appendChild(container)
 container.appendChild(cityName)
@@ -91,4 +88,8 @@ container.appendChild(temperature)
 container.appendChild(wind)
 container.appendChild(humidity)
 container.className='newDiv'
-}
+cityName.className='city'
+})
+})
+})
+

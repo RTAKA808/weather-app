@@ -66,3 +66,16 @@ height: 30%;
 width: 100%;
 font-size: 1.5em;
 }
+
+.newDiv{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-size: large;
+    padding: 10px;
+    line-height: 1.5em;
+}
+ h2{
+    font-size: 2em;
+ }
