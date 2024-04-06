@@ -98,12 +98,24 @@ cityName.className='city'
 function fiveDayRender(firstFetch){
 let latitude=firstFetch[0].lat
 let longitude=firstFetch[0].lon
-
-let fiveDayUrl=`api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&appid=${weatherAppAPIKey}`
+let fiveDayUrl=`https://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&appid=${weatherAppAPIKey}`
 fetch(fiveDayUrl).then(function(response){
     console.log(firstFetch)
     return response.json();
 }).then(function(data){
     console.log("5day fetch")
     console.log(data);
-})}
+    for(let i=0; i<data.list.length;i++){
+    let date=data.list[i].dt_txt
+    // let day=date.includes('00:00:00')
+    // if (day){
+
+    // }return day
+//   console.log (day)
+
+    
+}
+})
+
+}
+
