@@ -17,6 +17,7 @@ const weatherAppAPIKey = "d3544544038162ae81f0a4e78fb687cd"
 
 button.addEventListener('click',function(event){
 event.preventDefault();
+
 let city=searchBox.value
 let storedWeather={
     location:searchBox.value
@@ -60,7 +61,7 @@ fetch(url).then(function(response){
     
 
 //create task card
-
+    today.innerHTML=""
     let container=document.createElement('div');
     let cityName=document.createElement('h2')
     let cardDate=document.createElement('h3');
@@ -73,13 +74,14 @@ fetch(url).then(function(response){
    let windMPH=Math.floor(data2.wind.speed/1.467)
    let tempF=data2.main.temp
    let humidPer=data2.main.humidity
-    cityName.innerText=city
-    cardDate.innerText=dayjs.unix(data2.dt).format('MM-DD-YY') 
-    temperature.innerText= `Temperature: ${tempF} F`
-    wind.innerText=`Wind Speed: ${windMPH} MPH`
-    humidity.innerText= `Humidity: ${humidPer} %`
+    cityName.innerHTML=city
+    cardDate.innerHTML=dayjs.unix(data2.dt).format('MM-DD-YY') 
+    temperature.innerHTML= `Temperature: ${tempF} F`
+    wind.innerHTML=`Wind Speed: ${windMPH} MPH`
+    humidity.innerHTML= `Humidity: ${humidPer} %`
 
     icon.innerHTML=`<img src= https://openweathermap.org/img/wn/${iconPic}@2x.png>`
+
 
 today.appendChild(container)
 container.appendChild(cityName)
@@ -88,12 +90,50 @@ container.appendChild(icon)
 container.appendChild(temperature)
 container.appendChild(wind)
 container.appendChild(humidity)
+
 container.className='newDiv'
 cityName.className='city'
+    
+})
+})
+})
 
-})
-})
-})
+function createCard(day){
+    cards.innerHTML=''
+    for(let i=0; i<day.length;i++){ //loops through array and displays the dates as objects
+        let container=document.createElement('div');
+        let cityName=document.createElement('h2')
+        let cardDate=document.createElement('h3');
+        let temperature=document.createElement('p');
+        let wind=document.createElement('p');
+        let humidity=document.createElement('p');
+        let icon=document.createElement('h2');
+        let iconPic=day[i].weather[0].icon
+
+    let windMPH=Math.floor(day[i].wind.speed/1.467)
+    let tempF=day[i].main.temp
+    let humidPer=day[i].main.humidity
+    icon.innerHTML=`<img src= https://openweathermap.org/img/wn/${iconPic}@2x.png>`
+    cityName.innerHTML=searchBox.value
+    cardDate.innerHTML= day[i].dt_txt.split(" ")[0]
+    temperature.innerHTML= `Temperature: ${tempF} F`
+    wind.innerHTML=`Wind Speed: ${windMPH} MPH`
+    humidity.innerHTML= `Humidity: ${humidPer} %`
+    
+    cards.appendChild(container)
+    container.appendChild(cityName)
+    container.appendChild(cardDate)
+    container.appendChild(icon)
+    container.appendChild(temperature)
+    container.appendChild(wind)
+    container.appendChild(humidity)
+        }
+}
+
+
+
+
+
 
 function fiveDayRender(firstFetch){
 let latitude=firstFetch[0].lat
@@ -107,16 +147,19 @@ fetch(fiveDayUrl).then(function(response){
     console.log(data);
   
     let dates=data.list
-    let day=dates.filter((date)=>{
-        if(date.dt_txt.split(" ")[1]=== "00:00:00"){ //created a new array that only holds the information with the time being 00:00:00
-        return date
-        }
-    })
-    console.log(day)
-    for(let i=0; i<day.length;i++){ //loops through array and displays the dates as objects
-let newDate=day[i].dt_txt
-console.log(newDate)
-}
+    let day=dates.reduce((array,date)=>{
+    if(array.map(date.dt_txt.split(' ')[0])){
+        array.push(date)
+    }
+    return array
+      
+        // if(date.dt_txt.split(" ")[1]=== "00:00:00"){ //created a new array that only holds the information with the time being 00:00:00
+        // return date
+        // }
+    },[])
+   createCard(day)
+   console.log(day)
+
 })
 
 }
