@@ -73,11 +73,11 @@ fetch(url).then(function(response){
    let windMPH=Math.floor(data2.wind.speed/1.467)
    let tempF=data2.main.temp
    let humidPer=data2.main.humidity
-    cityName.innerHTML=city
-    cardDate.innerHTML=dayjs.unix(data2.dt).format('MM-DD-YY') 
-    temperature.innerHTML= `Temperature: ${tempF} F`
-    wind.innerHTML=`Wind Speed: ${windMPH} MPH`
-    humidity.innerHTML= `Humidity: ${humidPer} %`
+    cityName.innerText=city
+    cardDate.innerText=dayjs.unix(data2.dt).format('MM-DD-YY') 
+    temperature.innerText= `Temperature: ${tempF} F`
+    wind.innerText=`Wind Speed: ${windMPH} MPH`
+    humidity.innerText= `Humidity: ${humidPer} %`
 
     icon.innerHTML=`<img src= https://openweathermap.org/img/wn/${iconPic}@2x.png>`
 
@@ -105,15 +105,17 @@ fetch(fiveDayUrl).then(function(response){
 }).then(function(data){
     console.log("5day fetch")
     console.log(data);
-    for(let i=0; i<data.list.length;i++){
-    let date=data.list[i].dt_txt
-    // let day=date.includes('00:00:00')
-    // if (day){
-
-    // }return day
-//   console.log (day)
-
-    
+  
+    let dates=data.list
+    let day=dates.filter((date)=>{
+        if(date.dt_txt.split(" ")[1]=== "00:00:00"){ //created a new array that only holds the information with the time being 00:00:00
+        return date
+        }
+    })
+    console.log(day)
+    for(let i=0; i<day.length;i++){ //loops through array and displays the dates as objects
+let newDate=day[i].dt_txt
+console.log(newDate)
 }
 })
 
