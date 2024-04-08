@@ -1,10 +1,14 @@
-// form inputs
-//display current and future conditions/saved to search history
-//current weather for selected city
-///city name, date, icon,temperature, humidity, windspeed  ( weather/icon)
-//5 day forcast 
-//clickable history
-
+//click submit button => fires off a function that checks if there are items in local storage, if there isnt any it creates an empty array in local storage => calls the call api function while passing over the users input and weather api key
+//apicall does a fetch request to weather api=> calls the 5day render fx while passing on the data from the previous fetch request
+//passes down the cities name from the fetch to the history buttons fx 
+// fetches second set of data with current days weather and creates appends a card for todays weather to the HTML
+// the 5day render fx will get passed the data from the first fetch to get the longitude and latitude which is required to fetch the 5 day forecast data
+//we iterate through the 5day data with a reduce to filter out repeating dates and create a new array with unique dates weather
+//call the createcard fx while passing on the new arrays data
+//create card fx loops through the array and creates a new card with that days information
+//then we check to see if local storage has anything in it and if it does then it fires off the createLocalStorageBtn fx
+//the create localstoragebtn fx check to see if there are items in local storage and loops through and creates a new button for each item in the local storage
+//when clicking the history buttons that we just created from local storage calls teh callapi fx
 const searchBox = document.querySelector('#searchBox')
 const today = document.querySelector('#today')
 const fiveDay = document.querySelector('#fiveDay') 
@@ -12,24 +16,17 @@ const cards= document.querySelector('#cards')
 const button=document.querySelector('#button')
 const weatherAppAPIKey = "d3544544038162ae81f0a4e78fb687cd"
 const historyBtn=document.querySelector('.history')
-let history=[]
 
 
-button.addEventListener('click',function(event){
+
+button.addEventListener('click',function(event){  //event listener on submit button
 event.preventDefault();
 
 let city=searchBox.value
-if(!JSON.parse(localStorage.getItem('locations'))){
-    localStorage.setItem('locations',JSON.stringify(history))
+if(!JSON.parse(localStorage.getItem('locations'))){  //if theres no items in local storage we story an empty array in the local storage
+    localStorage.setItem('locations',JSON.stringify([]))
 }
-// let storedWeather={
-//     location:searchBox.value
-// }
-// let history=JSON.parse(localStorage.getItem('locations')) //grabs the stored city from local storage
-// if(!history){
-//     history=[]
-// }
-// history.push(storedWeather)
+
 
 
 
@@ -94,13 +91,13 @@ fetch(fiveDayUrl).then(function(response){
     console.log("5day fetch")
   
     let dates=data.list
-    let day = dates.reduce((arr, date) => {   //iterating through the array. filtering out repeating dates. compares new value to the prevous value
+    let day = dates.reduce((arr, date) => {   //iterating through the array. filtering out repeating dates by comparing new value to the prevous value. creates a new array with only the information from the next 5 days
         let currentDate = date.dt_txt.split(' ')[0]; //splits the date.dt_txt (date and time) into an array on its own and picks the index[0] item which is the date
-        if (!arr.some(item => item.dt_txt.split(' ')[0] === currentDate)) { //if the prevous date is different then it pushes the current date into the array.  Array.some is looking through the empty array
+        if (!arr.some(item => item.dt_txt.split(' ')[0] === currentDate)) { //if the prevous date is different then it pushes the current date into the array.  Array.some is looking through the array and checking to see if theres anything similar(similar to an includes)
             arr.push(date);
         }
-        return arr;
-    }, []);   //this empty array is the starting point that the dates get pushed into for comparison
+        return arr; //returning new array without duplicate dates
+    }, []);   //this empty array is the starting point for the reduce to compare to. this is the new array that the new dates get pushed into
    createCard(day) ///day is the new array we created with the dates that we want (new dates)
    console.log(day)
 
@@ -108,28 +105,45 @@ fetch(fiveDayUrl).then(function(response){
 
 }
 
-
+function createLocalStorageBtn(){
+    let historyLocal=JSON.parse(localStorage.getItem('locations'))
+    if(historyLocal.length>0){  //if there are items in local storage
+        historyLocal.forEach(element => { //looping through local storage
+            let createButton= document.createElement('button')  //creating a button with the name of the city in storage
+    historyBtn.appendChild(createButton) //adds the button to HTML//DOM
+    createButton.innerHTML=element //prints  city name from local storage array to the button
+    console.log(element)
+    createButton.id='histBtn'   
+   
+    createButton.addEventListener('click',function(event){   //event listener for clicking the history buttons
+        event.preventDefault();
+        callApi(element, weatherAppAPIKey)    //calls the callApi function which holds our fetch data
+    })
+    });
+    }
+   
+  
+}
 
 //function to render search history as buttons
 function historyButtons(parseData){
    
-    let historyLocal=JSON.parse(localStorage.getItem('locations'))  //grabbing locations from local storage
-    console.log(history)
+    let historyLocal=JSON.parse(localStorage.getItem('locations'))  //grabbing locations from local storage/ comes back as an array
+
    
     if(!historyLocal.includes(parseData)){   ///checking local storage to see if it contains the city name
-        history.push(parseData)      //if it doesnt include the city name we push the name to the empty array (history)
-        localStorage.setItem('locations',JSON.stringify(history))
-  
-    let createButton= document.createElement('button')  //creating a button with the name of the city in storage
-    historyBtn.appendChild(createButton)
+        localStorage.setItem('locations',JSON.stringify([...historyLocal, parseData]))  // "..." is the spread operator which copies an arrays data.  the spread operator copies the array data without modifying the original array
+  //setting ""locations" in local storage with a value of the new array with parsedata(cities name) and all of our previous local storage data
+    //fires the call api function and passes the values of the city name and weather api key
+ let createButton= document.createElement('button')  //creating a button with the name of the city in storage
+    historyBtn.appendChild(createButton) 
     createButton.innerHTML=parseData
     console.log(parseData)
     createButton.id='histBtn'
    
     createButton.addEventListener('click',function(event){   //event listener for clicking the history buttons
         event.preventDefault();
-        callApi(parseData, weatherAppAPIKey)  //fires the call api function and passes the values of the city name and weather api key
-
+        callApi(parseData, weatherAppAPIKey) 
 
     })
 }
@@ -199,6 +213,6 @@ function callApi(city, weatherAppAPIKey){
     }
     console.log(JSON.parse(localStorage.getItem('locations')))
     if(JSON.parse(localStorage.getItem('locations'))!==null && JSON.parse(localStorage.getItem('locations')).length>0){   //if there are items in local storage, fire history buttons function
-        
-        historyButtons()
+        //if local storage doesnt come back as null and the length of the array is more than 0 we create the buttons
+        createLocalStorageBtn()
     }
