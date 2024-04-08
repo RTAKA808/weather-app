@@ -35,16 +35,12 @@ header{
     display: flex;
     flex-direction: column;
     justify-content:flex-start;
-    width: 20%;
-    height: 80vh;
-    margin: 10px;
+   padding: 10px;
 }
 
 #container{
     display: flex;
     flex-direction: column;
-    height: 80vh;
-    width: 100%;
     padding: 15px;
 
 }
@@ -55,7 +51,6 @@ header{
 }
 
 #today{
-height: 30%;
 width: 100%;
 border: 1px solid black;
 margin-bottom: 3em;
@@ -74,8 +69,29 @@ font-size: 1.5em;
     align-items: center;
     font-size: large;
     padding: 10px;
-    line-height: 1.5em;
+    line-height: 2em;
 }
  h2{
     font-size: 2em;
+ }
+
+ #cards{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+ }
+
+ .fiveDiv{
+    border: 1px solid black;
+    padding: 10px;
+    line-height: 2em;
+ }
+
+
+
+ @media (max-width:576px){
+    #cards, .mainContent, .aside{
+        flex-direction: column;
+        max-width: 100%;
+    }
  }

@@ -11,7 +11,7 @@ const fiveDay = document.querySelector('#fiveDay')
 const cards= document.querySelector('#cards')
 const button=document.querySelector('#button')
 const weatherAppAPIKey = "d3544544038162ae81f0a4e78fb687cd"
-
+const historyBtn=document.querySelector('.history')
 
 
 
@@ -22,16 +22,18 @@ let city=searchBox.value
 let storedWeather={
     location:searchBox.value
 }
-let history=JSON.parse(localStorage.getItem('locations'))
+let history=JSON.parse(localStorage.getItem('locations')) //grabs the stored city from local storage
 if(!history){
     history=[]
 }
 history.push(storedWeather)
 
-if(!storedWeather.location){
+
+
+if(!storedWeather.location){// ensures there is an input
     alert('Please enter a location')
 }else{
-localStorage.setItem('locations',JSON.stringify(history))
+localStorage.setItem('locations',JSON.stringify(history))  //assigns the previously entered cities with a key of locations to the local storage
 searchBox.value=''
 }
 
@@ -46,11 +48,11 @@ fetch(url).then(function(response){
     fiveDayRender(data);
     console.log("--------- First request with geolocation --------")
     console.log(data);
-
+   
     const latitude = data[0].lat;
     const longitude = data[0].lon;
     console.log(latitude, longitude);
-
+    historyButtons(data)
     const url2 = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&units=imperial&appid=${weatherAppAPIKey}`
     fetch(url2).then(function(response2) {
         return response2.json();
@@ -74,7 +76,7 @@ fetch(url).then(function(response){
    let windMPH=Math.floor(data2.wind.speed/1.467)
    let tempF=data2.main.temp
    let humidPer=data2.main.humidity
-    cityName.innerHTML=city
+    cityName.innerHTML=data[0].name
     cardDate.innerHTML=dayjs.unix(data2.dt).format('MM-DD-YY') 
     temperature.innerHTML= `Temperature: ${tempF} F`
     wind.innerHTML=`Wind Speed: ${windMPH} MPH`
@@ -98,9 +100,9 @@ cityName.className='city'
 })
 })
 
-function createCard(day){
-    cards.innerHTML=''
-    for(let i=0; i<day.length;i++){ //loops through array and displays the dates as objects
+function createCard(day){  //fx to create a card for current days weather / days is the new array we made with the reduce function
+    cards.innerHTML='' //clears the card before replacing it with the new data
+    for(let i=0; i<5;i++){ //loops through array and displays the dates as objects . creates 5 cards because sometimes the api gives us 6 days in the forecast
         let container=document.createElement('div');
         let cityName=document.createElement('h2')
         let cardDate=document.createElement('h3');
@@ -127,6 +129,7 @@ function createCard(day){
     container.appendChild(temperature)
     container.appendChild(wind)
     container.appendChild(humidity)
+    container.className='fiveDiv'
         }
 }
 
@@ -134,33 +137,44 @@ function createCard(day){
 
 
 
-
-function fiveDayRender(firstFetch){
+//fx to render the 5 day forecast 
+function fiveDayRender(firstFetch){  //first fetch variable gets passed the data from the first api pull (firstfetch=data )
 let latitude=firstFetch[0].lat
 let longitude=firstFetch[0].lon
-let fiveDayUrl=`https://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&appid=${weatherAppAPIKey}`
+let fiveDayUrl=`https://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&units=imperial&appid=${weatherAppAPIKey}`
 fetch(fiveDayUrl).then(function(response){
     console.log(firstFetch)
     return response.json();
 }).then(function(data){
     console.log("5day fetch")
-    console.log(data);
   
     let dates=data.list
-    let day=dates.reduce((array,date)=>{
-    if(array.map(date.dt_txt.split(' ')[0])){
-        array.push(date)
-    }
-    return array
-      
-        // if(date.dt_txt.split(" ")[1]=== "00:00:00"){ //created a new array that only holds the information with the time being 00:00:00
-        // return date
-        // }
-    },[])
-   createCard(day)
+    let day = dates.reduce((arr, date) => {   //iterating through the array. filtering out repeating dates. compares new value to the prevous value
+        let currentDate = date.dt_txt.split(' ')[0]; //splits the date.dt_txt (date and time) into an array on its own and picks the index[0] item which is the date
+        if (!arr.some(item => item.dt_txt.split(' ')[0] === currentDate)) { //if the prevous date is different then it pushes the current date into the array.  Array.some is looking through the empty array
+            arr.push(date);
+        }
+        return arr;
+    }, []);   //this empty array is the starting point that the dates get pushed into for comparison
+   createCard(day) ///day is the new array we created with the dates that we want (new dates)
    console.log(day)
 
 })
 
 }
 
+
+
+//function to render search history as buttons
+function historyButtons(parseData){
+    let createButton= document.createElement('button')
+    historyBtn.appendChild(createButton)
+    createButton.innerHTML=parseData[0].name
+    console.log(parseData)
+    createButton.id='histBtn'
+    createButton.addEventListener('click',function(event){
+        event.preventDefault();
+
+    })
+    
+}
